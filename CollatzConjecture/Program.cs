@@ -31,7 +31,6 @@ namespace CollatzConjecture
                 new OneThreadSolver(),
                 new LockSolver(threadsCount),
                 new ConcurrentQueueSolver(threadsCount),
-                new InterlockedSolver(threadsCount),
                 new ParallelSolver(),
                 new MutexSolver(threadsCount),
             };

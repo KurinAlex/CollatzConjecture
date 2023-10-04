@@ -23,12 +23,8 @@
         {
             lock (lockObj)
             {
-                if (!numbersQueue.TryDequeue(out num))
-                {
-                    return false;
-                }
+                return numbersQueue.TryDequeue(out num);
             }
-            return true;
         }
     }
 }
