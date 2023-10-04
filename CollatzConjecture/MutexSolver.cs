@@ -19,7 +19,7 @@
             numbersQueue = new Queue<int>(numbers);
         }
 
-        protected override bool GetNext(out int num)
+        protected override bool TryGetNext(out int num)
         {
             mutex.WaitOne();
             try

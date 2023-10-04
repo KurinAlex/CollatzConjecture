@@ -20,7 +20,7 @@ namespace CollatzConjecture
             numbersQueue = new ConcurrentQueue<int>(numbers);
         }
 
-        protected override bool GetNext(out int num)
+        protected override bool TryGetNext(out int num)
         {
             return numbersQueue.TryDequeue(out num);
         }

@@ -8,18 +8,26 @@
 
         protected static int GetIterationsCount(int number)
         {
+            if (number <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(number), "Input number must be positive integer");
+            }
+
             int iterations = 0;
             long n = number;
 
             while (n > 1)
             {
-                if (n % 2 == 0)
+                if (long.IsEvenInteger(n))
                 {
                     n /= 2;
                 }
                 else
                 {
-                    n = 3 * n + 1;
+                    checked
+                    {
+                        n = 3 * n + 1;
+                    }
                 }
                 iterations++;
             }

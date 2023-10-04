@@ -9,8 +9,6 @@
             this.threadsCount = threadsCount;
         }
 
-        public abstract override string ToString();
-
         public override double GetAverageIterations(ICollection<int> numbers)
         {
             Initialize(numbers);
@@ -42,6 +40,8 @@
             return (double)sum / numbers.Count;
         }
 
+        public abstract override string ToString();
+
         private void Run(object? o)
         {
             if (o is not Container container)
@@ -49,7 +49,7 @@
                 throw new ArgumentException($"Argument has wrong type. Must be {typeof(Container)}");
             }
 
-            while (GetNext(out int num))
+            while (TryGetNext(out int num))
             {
                 int iterations = GetIterationsCount(num);
                 container.Sum += iterations;
@@ -58,7 +58,7 @@
 
         protected abstract void Initialize(ICollection<int> numbers);
 
-        protected abstract bool GetNext(out int num);
+        protected abstract bool TryGetNext(out int num);
 
         class Container
         {
