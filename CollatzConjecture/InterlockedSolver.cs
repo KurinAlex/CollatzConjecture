@@ -20,7 +20,7 @@
             index = -1;
         }
 
-        protected override bool GetNext(out int num)
+        protected override bool TryGetNext(out int num)
         {
             int currentIndex = Interlocked.Increment(ref index);
             if (currentIndex < numbersList.Count)

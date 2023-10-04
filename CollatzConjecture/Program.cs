@@ -32,34 +32,42 @@ namespace CollatzConjecture
                 new LockSolver(threadsCount),
                 new ConcurrentQueueSolver(threadsCount),
                 new InterlockedSolver(threadsCount),
+                new ParallelSolver(),
                 new MutexSolver(threadsCount),
             };
 
             var results = new List<double>(solvers.Length);
 
-            var timer = new Stopwatch();
-            foreach (CollatzConjectureSolver solver in solvers)
+            try
             {
-                timer.Restart();
-                double result = solver.GetAverageIterations(numbers);
-                timer.Stop();
+                var timer = new Stopwatch();
+                foreach (CollatzConjectureSolver solver in solvers)
+                {
+                    timer.Restart();
+                    double result = solver.GetAverageIterations(numbers);
+                    timer.Stop();
+
+                    Console.WriteLine();
+                    Console.WriteLine($"{solver}:");
+                    Console.WriteLine($"- Elapsed: {timer.Elapsed.TotalSeconds} s");
+                    Console.WriteLine($"- Result: {result}");
+
+                    results.Add(result);
+                }
+
+                bool resultsEqual = results.TrueForAll(r => r == results[0]);
 
                 Console.WriteLine();
-                Console.WriteLine($"{solver}:");
-                Console.WriteLine($"- Elapsed: {timer.Elapsed.TotalSeconds} s");
-                Console.WriteLine($"- Result: {result}");
+                Console.Write("All results are equal: ");
 
-                results.Add(result);
+                Console.ForegroundColor = resultsEqual ? ConsoleColor.Green : ConsoleColor.Red;
+                Console.WriteLine(resultsEqual);
+                Console.ResetColor();
             }
-
-            bool resultsEqual = results.TrueForAll(r => r == results[0]);
-
-            Console.WriteLine();
-            Console.Write("All results are equal: ");
-
-            Console.ForegroundColor = resultsEqual ? ConsoleColor.Green : ConsoleColor.Red;
-            Console.WriteLine(resultsEqual);
-            Console.ResetColor();
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
     }
 }
