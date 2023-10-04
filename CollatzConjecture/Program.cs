@@ -29,9 +29,10 @@ namespace CollatzConjecture
 
             CollatzConjectureSolver[] solvers = {
                 new OneThreadSolver(),
+                new ParallelSolver(),
                 new LockSolver(threadsCount),
                 new ConcurrentQueueSolver(threadsCount),
-                new ParallelSolver(),
+                new InterlockedSolver(threadsCount),
                 new MutexSolver(threadsCount),
             };
 
