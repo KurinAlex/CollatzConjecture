@@ -1,38 +1,38 @@
-﻿namespace CollatzConjecture
+﻿namespace CollatzConjecture;
+
+public abstract class CollatzConjectureSolver
 {
-    public abstract class CollatzConjectureSolver
-    {
-        public abstract double GetAverageIterations(ICollection<int> numbers);
+	public abstract double GetAverageIterations(ICollection<int> numbers);
 
-        public override abstract string ToString();
+	public abstract string Name { get; }
 
-        protected static int GetIterationsCount(int number)
-        {
-            if (number <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(number), "Input number must be positive integer");
-            }
+	protected static long GetIterationsCount(int number)
+	{
+		if (number <= 0)
+		{
+			throw new ArgumentOutOfRangeException(nameof(number), "Input number must be positive integer");
+		}
 
-            int iterations = 0;
-            long n = number;
+		var iterations = 0L;
+		long n = number;
 
-            while (n > 1)
-            {
-                if (long.IsEvenInteger(n))
-                {
-                    n /= 2;
-                }
-                else
-                {
-                    checked
-                    {
-                        n = 3 * n + 1;
-                    }
-                }
-                iterations++;
-            }
+		while (n > 1)
+		{
+			if (long.IsEvenInteger(n))
+			{
+				n /= 2;
+			}
+			else
+			{
+				checked
+				{
+					n = 3 * n + 1;
+				}
+			}
 
-            return iterations;
-        }
-    }
+			iterations++;
+		}
+
+		return iterations;
+	}
 }

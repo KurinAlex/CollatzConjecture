@@ -1,39 +1,32 @@
-﻿namespace CollatzConjecture
+﻿namespace CollatzConjecture;
+
+public class MutexSolver(int threadsCount) : MultithreadingSolver(threadsCount)
 {
-    public class MutexSolver : MultithreadingSolver
-    {
-        private Queue<int> numbersQueue = new();
-        private readonly Mutex mutex = new();
+	private Queue<int> _numbersQueue = new();
+	private readonly Mutex _mutex = new();
 
-        public MutexSolver(int threadsCount) : base(threadsCount)
-        {
-        }
+	public override string Name => "Multithreading (mutex)";
 
-        public override string ToString()
-        {
-            return "Multithreading (mutex)";
-        }
+	protected override void Initialize(ICollection<int> numbers)
+	{
+		_numbersQueue = new Queue<int>(numbers);
+	}
 
-        protected override void Initialize(ICollection<int> numbers)
-        {
-            numbersQueue = new Queue<int>(numbers);
-        }
+	protected override bool TryGetNext(out int num)
+	{
+		_mutex.WaitOne();
+		try
+		{
+			if (!_numbersQueue.TryDequeue(out num))
+			{
+				return false;
+			}
+		}
+		finally
+		{
+			_mutex.ReleaseMutex();
+		}
 
-        protected override bool TryGetNext(out int num)
-        {
-            mutex.WaitOne();
-            try
-            {
-                if (!numbersQueue.TryDequeue(out num))
-                {
-                    return false;
-                }
-            }
-            finally
-            {
-                mutex.ReleaseMutex();
-            }
-            return true;
-        }
-    }
+		return true;
+	}
 }

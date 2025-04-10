@@ -1,35 +1,28 @@
-﻿namespace CollatzConjecture
+﻿namespace CollatzConjecture;
+
+public class InterlockedSolver(int threadsCount) : MultithreadingSolver(threadsCount)
 {
-    public class InterlockedSolver : MultithreadingSolver
-    {
-        private IList<int> numbersList = new List<int>();
-        private int index;
+	private IList<int> _numbersList = new List<int>();
+	private int _index;
 
-        public InterlockedSolver(int threadsCount) : base(threadsCount)
-        {
-        }
+	public override string Name => "Multithreading (interlocked)";
 
-        public override string ToString()
-        {
-            return "Multithreading (interlocked)";
-        }
+	protected override void Initialize(ICollection<int> numbers)
+	{
+		_numbersList = numbers.ToList();
+		_index = -1;
+	}
 
-        protected override void Initialize(ICollection<int> numbers)
-        {
-            numbersList = numbers.ToList();
-            index = -1;
-        }
+	protected override bool TryGetNext(out int num)
+	{
+		var currentIndex = Interlocked.Increment(ref _index);
+		if (currentIndex < _numbersList.Count)
+		{
+			num = _numbersList[currentIndex];
+			return true;
+		}
 
-        protected override bool TryGetNext(out int num)
-        {
-            int currentIndex = Interlocked.Increment(ref index);
-            if (currentIndex < numbersList.Count)
-            {
-                num = numbersList[currentIndex];
-                return true;
-            }
-            num = 0;
-            return false;
-        }
-    }
+		num = 0;
+		return false;
+	}
 }

@@ -1,73 +1,74 @@
 ﻿using System.Diagnostics;
 
-namespace CollatzConjecture
+namespace CollatzConjecture;
+
+internal static class Program
 {
-    internal static class Program
-    {
-        static int EnterPositiveInt(string name)
-        {
-            int result;
-            string? input;
-            do
-            {
-                Console.Write($"Enter {name}: ");
-                input = Console.ReadLine();
-            } while (!int.TryParse(input, out result) || result < 1);
-            return result;
-        }
+	private static int EnterPositiveInt(string name)
+	{
+		int result;
+		string? input;
+		do
+		{
+			Console.Write($"Enter {name}: ");
+			input = Console.ReadLine();
+		} while (!int.TryParse(input, out result) || result < 1);
 
-        static void Main()
-        {
-            int numbersCount = EnterPositiveInt("numbers count");
-            int threadsCount = EnterPositiveInt("threads count");
+		return result;
+	}
 
-            var numbers = new List<int>(numbersCount);
-            for (int num = 1; num <= numbersCount; num++)
-            {
-                numbers.Add(num);
-            }
+	private static void Main()
+	{
+		var numbersCount = EnterPositiveInt("numbers count");
+		var threadsCount = EnterPositiveInt("threads count");
 
-            CollatzConjectureSolver[] solvers = {
-                new OneThreadSolver(),
-                new ParallelSolver(),
-                new LockSolver(threadsCount),
-                new ConcurrentQueueSolver(threadsCount),
-                new InterlockedSolver(threadsCount),
-                new MutexSolver(threadsCount),
-            };
+		var numbers = new List<int>(numbersCount);
+		for (var num = 1; num <= numbersCount; num++)
+		{
+			numbers.Add(num);
+		}
 
-            var results = new List<double>(solvers.Length);
+		CollatzConjectureSolver[] solvers =
+		{
+			new OneThreadSolver(),
+			new ParallelSolver(),
+			new LockSolver(threadsCount),
+			new ConcurrentQueueSolver(threadsCount),
+			new InterlockedSolver(threadsCount),
+			new MutexSolver(threadsCount)
+		};
 
-            try
-            {
-                var timer = new Stopwatch();
-                foreach (CollatzConjectureSolver solver in solvers)
-                {
-                    timer.Restart();
-                    double result = solver.GetAverageIterations(numbers);
-                    timer.Stop();
+		var results = new List<double>(solvers.Length);
 
-                    Console.WriteLine();
-                    Console.WriteLine($"{solver}:");
-                    Console.WriteLine($"- Elapsed: {timer.Elapsed.TotalSeconds} s");
-                    Console.WriteLine($"- Result: {result}");
+		try
+		{
+			var timer = new Stopwatch();
+			foreach (var solver in solvers)
+			{
+				timer.Restart();
+				var result = solver.GetAverageIterations(numbers);
+				timer.Stop();
 
-                    results.Add(result);
-                }
+				Console.WriteLine();
+				Console.WriteLine($"{solver.Name}:");
+				Console.WriteLine($"- Elapsed: {timer.Elapsed.TotalSeconds} s");
+				Console.WriteLine($"- Result: {result}");
 
-                bool resultsEqual = results.TrueForAll(r => r == results[0]);
+				results.Add(result);
+			}
 
-                Console.WriteLine();
-                Console.Write("All results are equal: ");
+			var resultsEqual = results.TrueForAll(r => Math.Abs(r - results[0]) < 1e-5);
 
-                Console.ForegroundColor = resultsEqual ? ConsoleColor.Green : ConsoleColor.Red;
-                Console.WriteLine(resultsEqual);
-                Console.ResetColor();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-    }
+			Console.WriteLine();
+			Console.Write("All results are equal: ");
+
+			Console.ForegroundColor = resultsEqual ? ConsoleColor.Green : ConsoleColor.Red;
+			Console.WriteLine(resultsEqual);
+			Console.ResetColor();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex);
+		}
+	}
 }

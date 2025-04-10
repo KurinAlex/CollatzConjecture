@@ -1,20 +1,12 @@
-﻿namespace CollatzConjecture
-{
-    public class OneThreadSolver : CollatzConjectureSolver
-    {
-        public override double GetAverageIterations(ICollection<int> numbers)
-        {
-            long sum = 0;
-            foreach (int num in numbers)
-            {
-                sum += GetIterationsCount(num);
-            }
-            return (double)sum / numbers.Count;
-        }
+﻿namespace CollatzConjecture;
 
-        public override string ToString()
-        {
-            return "One thread";
-        }
-    }
+public class OneThreadSolver : CollatzConjectureSolver
+{
+	public override string Name => "One thread";
+
+	public override double GetAverageIterations(ICollection<int> numbers)
+	{
+		var sum = numbers.Sum(GetIterationsCount);
+		return (double)sum / numbers.Count;
+	}
 }

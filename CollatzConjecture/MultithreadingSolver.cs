@@ -1,72 +1,53 @@
-﻿namespace CollatzConjecture
+﻿namespace CollatzConjecture;
+
+public abstract class MultithreadingSolver(int threadsCount) : CollatzConjectureSolver
 {
-    public abstract class MultithreadingSolver : CollatzConjectureSolver
-    {
-        private readonly int threadsCount;
+	public override double GetAverageIterations(ICollection<int> numbers)
+	{
+		Initialize(numbers);
 
-        protected MultithreadingSolver(int threadsCount)
-        {
-            this.threadsCount = threadsCount;
-        }
+		var containers = new List<Container>(threadsCount);
+		var threads = new List<Thread>(threadsCount);
+		for (var i = 0; i < threadsCount; i++)
+		{
+			var container = new Container();
+			var thread = new Thread(Run);
 
-        public override double GetAverageIterations(ICollection<int> numbers)
-        {
-            Initialize(numbers);
+			containers.Add(container);
+			threads.Add(thread);
 
-            var containers = new List<Container>(threadsCount);
-            var threads = new List<Thread>(threadsCount);
-            for (int i = 0; i < threadsCount; i++)
-            {
-                var container = new Container();
-                var thread = new Thread(Run);
+			thread.Start(container);
+		}
 
-                containers.Add(container);
-                threads.Add(thread);
+		foreach (var thread in threads)
+		{
+			thread.Join();
+		}
 
-                thread.Start(container);
-            }
+		var sum = containers.Sum(container => container.Sum);
+		return (double)sum / numbers.Count;
+	}
 
-            foreach (Thread thread in threads)
-            {
-                thread.Join();
-            }
+	private void Run(object? o)
+	{
+		if (o is not Container container)
+		{
+			throw new ArgumentException($"Argument has wrong type. Must be {typeof(Container)}");
+		}
 
-            long sum = 0;
-            foreach (Container container in containers)
-            {
-                sum += container.Sum;
-            }
+		while (TryGetNext(out var num))
+		{
+			var iterations = GetIterationsCount(num);
+			container.Sum += iterations;
+		}
+	}
 
-            return (double)sum / numbers.Count;
-        }
+	protected abstract void Initialize(ICollection<int> numbers);
 
-        public abstract override string ToString();
+	protected abstract bool TryGetNext(out int num);
 
-        private void Run(object? o)
-        {
-            if (o is not Container container)
-            {
-                throw new ArgumentException($"Argument has wrong type. Must be {typeof(Container)}");
-            }
-
-            while (TryGetNext(out int num))
-            {
-                int iterations = GetIterationsCount(num);
-                container.Sum += iterations;
-            }
-        }
-
-        protected abstract void Initialize(ICollection<int> numbers);
-
-        protected abstract bool TryGetNext(out int num);
-
-        class Container
-        {
-            public long Sum
-            {
-                get;
-                set;
-            }
-        }
-    }
+	private class Container
+	{
+		public long Sum { get; set; }
+	}
 }

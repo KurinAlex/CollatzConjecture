@@ -1,30 +1,22 @@
-﻿namespace CollatzConjecture
+﻿namespace CollatzConjecture;
+
+public class LockSolver(int threadsCount) : MultithreadingSolver(threadsCount)
 {
-    public class LockSolver : MultithreadingSolver
-    {
-        private Queue<int> numbersQueue = new();
-        private readonly object lockObj = new();
+	private Queue<int> _numbersQueue = new();
+	private readonly object _lockObj = new();
 
-        public LockSolver(int threadsCount) : base(threadsCount)
-        {
-        }
+	public override string Name => "Multithreading (lock)";
 
-        public override string ToString()
-        {
-            return "Multithreading (lock)";
-        }
+	protected override void Initialize(ICollection<int> numbers)
+	{
+		_numbersQueue = new Queue<int>(numbers);
+	}
 
-        protected override void Initialize(ICollection<int> numbers)
-        {
-            numbersQueue = new Queue<int>(numbers);
-        }
-
-        protected override bool TryGetNext(out int num)
-        {
-            lock (lockObj)
-            {
-                return numbersQueue.TryDequeue(out num);
-            }
-        }
-    }
+	protected override bool TryGetNext(out int num)
+	{
+		lock (_lockObj)
+		{
+			return _numbersQueue.TryDequeue(out num);
+		}
+	}
 }
