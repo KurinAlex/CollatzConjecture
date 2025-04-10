@@ -1,28 +1,20 @@
 ﻿using System.Collections.Concurrent;
 
-namespace CollatzConjecture
+namespace CollatzConjecture;
+
+public class ConcurrentQueueSolver(int threadsCount) : MultithreadingSolver(threadsCount)
 {
-    public class ConcurrentQueueSolver : MultithreadingSolver
-    {
-        private ConcurrentQueue<int> numbersQueue = new();
+	private ConcurrentQueue<int> _numbersQueue = new();
 
-        public ConcurrentQueueSolver(int threadsCount) : base(threadsCount)
-        {
-        }
+	public override string Name => "Multithreading (concurrent queue)";
 
-        public override string ToString()
-        {
-            return "Multithreading (concurrent queue)";
-        }
+	protected override void Initialize(ICollection<int> numbers)
+	{
+		_numbersQueue = new ConcurrentQueue<int>(numbers);
+	}
 
-        protected override void Initialize(ICollection<int> numbers)
-        {
-            numbersQueue = new ConcurrentQueue<int>(numbers);
-        }
-
-        protected override bool TryGetNext(out int num)
-        {
-            return numbersQueue.TryDequeue(out num);
-        }
-    }
+	protected override bool TryGetNext(out int num)
+	{
+		return _numbersQueue.TryDequeue(out num);
+	}
 }
